@@ -17,9 +17,9 @@ export class TeachersService {
         return this.teachers;
     }
 
-    findOne(id: string) {
-        const teacher = this.teachers.find(teacher => teacher.id === Number(id));
-        if (teacher) return teacher;
+    findOne(id: number) {
+        const teacher = this.teachers.find(teacher => teacher.id === id);
+        if (Teacher) return teacher;
         throw new HttpException("Esse professor não existe", HttpStatus.NOT_FOUND);
     }
 
@@ -35,8 +35,8 @@ export class TeachersService {
         return newTeacher;
     }
 
-    update(id: string, updateTeacherDto: UpdateTeacherDto) {
-        const teacherIndex = this.teachers.findIndex(teacher => teacher.id === Number(id));
+    update(id: number, updateTeacherDto: UpdateTeacherDto) {
+        const teacherIndex = this.teachers.findIndex(teacher => teacher.id === id);
         if (teacherIndex < 0)
             throw new HttpException("Esse professor não existe", HttpStatus.NOT_FOUND);
 
@@ -46,8 +46,8 @@ export class TeachersService {
         return this.teachers[teacherIndex];
     }
 
-    remove(id: string) {
-        const teacherIndex = this.teachers.findIndex(teacher => teacher.id === Number(id));
+    remove(id: number) {
+        const teacherIndex = this.teachers.findIndex(teacher => teacher.id === id);
         if (teacherIndex < 0)
             throw new HttpException("Esse professor não existe", HttpStatus.NOT_FOUND);
 

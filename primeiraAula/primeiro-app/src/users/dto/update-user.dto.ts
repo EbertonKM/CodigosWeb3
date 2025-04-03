@@ -1,3 +1,4 @@
-export class UpdateUserDto {
-    readonly user?: string;
-}
+import { PartialType } from "@nestjs/mapped-types";
+import { CreateUserDto } from "./create-user.dto";
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {}

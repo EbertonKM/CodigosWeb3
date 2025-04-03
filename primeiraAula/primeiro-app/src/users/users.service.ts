@@ -17,9 +17,9 @@ export class UsersService {
         return this.users;
     }
 
-    findOne(id: string) {
-        const user = this.users.find(user => user.id === Number(id));
-        if (user) return user;
+    findOne(id: number) {
+        const user = this.users.find(user => user.id === id);
+        if (User) return user;
         throw new HttpException("Esse usuário não existe", HttpStatus.NOT_FOUND);
     }
 
@@ -35,8 +35,8 @@ export class UsersService {
         return newUser;
     }
 
-    update(id: string, updateUserDto: UpdateUserDto) {
-        const userIndex = this.users.findIndex(user => user.id === Number(id));
+    update(id: number, updateUserDto: UpdateUserDto) {
+        const userIndex = this.users.findIndex(user => user.id === id);
         if (userIndex < 0)
             throw new HttpException("Esse usuário não existe", HttpStatus.NOT_FOUND);
 
@@ -46,8 +46,8 @@ export class UsersService {
         return this.users[userIndex];
     }
 
-    remove(id: string) {
-        const userIndex = this.users.findIndex(user => user.id === Number(id));
+    remove(id: number) {
+        const userIndex = this.users.findIndex(user => user.id === id);
         if (userIndex < 0)
             throw new HttpException("Esse usuário não existe", HttpStatus.NOT_FOUND);
 
