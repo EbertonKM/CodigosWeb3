@@ -1,57 +1,90 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, HttpVersionNotSupportedException, Injectable } from '@nestjs/common';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from 'src/tasks/dto/create-task.dto';
 import { UpdateTaskDto } from 'src/tasks/dto/update-task.dto';
-import { Task } from 'src/tasks/entities/task.entity';
 
 @Injectable()
 export class TasksService {
 
-    private tasks: Task[] = [
-        {
-            id: 1,
-            task: "primeira tarefa"
-        }
-    ]
+    constructor(private readonly prismaService: PrismaService) {}
 
-    findAll() {
-        return this.tasks
+    async findAll(paginationDto: PaginationDto) {
+        const {limit = 10, offset = 0} = paginationDto
+
+        const allTasks = await this.prismaService.task.findMany({
+            take: limit,
+            skip: offset,
+            orderBy: {
+                created: 'desc'
+            }
+        })
+        return allTasks
     }
 
-    findOne(id: number) {
-        const task = this.tasks.find(task => task.id === id)
-        if (Task) return task;
+    async findOne(id: number) {
+        const task = await this.prismaService.task.findFirst({
+            where: {
+                id: id
+            }
+        })
+        if (task?.task) return task
         throw new HttpException("Essa tarefa não existe", HttpStatus.NOT_FOUND)
     }
 
-    create(createTaskDto: CreateTaskDto) {
-        const newId = this.tasks.length + 1
-
-        const newTask = {
-            id: newId,
-            ...createTaskDto
+    async create(createTaskDto: CreateTaskDto) {
+        try {
+            const newTask = await this.prismaService.task.create({
+                data: {
+                    task: createTaskDto.task
+                }
+            })
+            return newTask
+        }catch(e) {
+            throw new HttpException("Não foi possível cadastrar a tarefa", HttpStatus.BAD_REQUEST)
         }
-
-        this.tasks.push(newTask)
-        return newTask
     }
 
-    update(id: number, updateTaskDto: UpdateTaskDto) {
-        const taskIndex = this.tasks.findIndex(task => task.id === id)
-        if (taskIndex < 0)
-            throw new HttpException("Essa tarefa não existe", HttpStatus.NOT_FOUND)
+    async update(id: number, updateTaskDto: UpdateTaskDto) {
+        try {
+            const findTask = await this.prismaService.task.findFirst({
+                where: {
+                    id: id
+                }
+            })
+            if(!findTask)
+                throw new HttpException("Essa tarefa não existe", HttpStatus.NOT_FOUND)
 
-        const taskItem = this.tasks[taskIndex]
-        this.tasks[taskIndex] = { ...taskItem, ...updateTaskDto }
-
-        return taskItem[taskIndex]
+            const task = await this.prismaService.task.update({
+                where: {
+                    id: findTask.id
+                },
+                data: updateTaskDto
+            })
+            return task
+        }catch(e) {
+            throw new HttpException("Não foi possível atualizar a tarefa", HttpStatus.BAD_REQUEST)
+        }
     }
 
-    remove(id: number) {
-        const taskIndex = this.tasks.findIndex(task => task.id === id)
-        if (taskIndex < 0)
-            throw new HttpException("Essa tarefa não existe", HttpStatus.NOT_FOUND)
+    async remove(id: number) {
+        try {
+            const findTask = await this.prismaService.task.findFirst({
+                where: {
+                    id: id
+                }
+            })
+            if(!findTask)
+                throw new HttpException("Essa tarefa não existe", HttpStatus.NOT_FOUND)
 
-        this.tasks.splice(taskIndex, 1)
-        return "Tarefa deletada"
+            await this.prismaService.task.delete({
+                where: {
+                    id: findTask.id
+                }
+            })
+            return "Tarefa excluída com sucesso"
+        }catch(e) {
+            throw new HttpException("Não foi possível deletar a tarefa", HttpStatus.BAD_REQUEST)
+        }
     }
 }

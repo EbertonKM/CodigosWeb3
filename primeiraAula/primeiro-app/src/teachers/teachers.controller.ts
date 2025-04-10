@@ -2,14 +2,15 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query 
 import { TeachersService } from './teachers.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('teachers')
 export class TeachersController {
   constructor(private readonly teachersService: TeachersService) {}
 
   @Get()
-      findAllTasks(@Query() queryParam: any) {
-        return this.teachersService.findAll();
+      findAllTasks(@Query() paginationDto: PaginationDto) {
+        return this.teachersService.findAll(paginationDto);
       }
     
       @Get(':id')

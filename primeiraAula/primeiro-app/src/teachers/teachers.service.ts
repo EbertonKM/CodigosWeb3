@@ -6,13 +6,6 @@ import { Teacher } from 'src/teachers/entities/teacher.entity';
 @Injectable()
 export class TeachersService {
 
-    private teachers: Teacher[] = [
-        {
-            id: 1,
-            teacher: "Primeiro professor"
-        }
-    ]
-
     findAll() {
         return this.teachers;
     }

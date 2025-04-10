@@ -2,14 +2,15 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query 
 import { GuestsService } from './guests.service';
 import { CreateGuestDto } from './dto/create-guest.dto';
 import { UpdateGuestDto } from './dto/update-guest.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('guests')
 export class GuestsController {
   constructor(private readonly guestsService: GuestsService) {}
 
   @Get()
-    findAllTasks(@Query() queryParam: any) {
-      return this.guestsService.findAll();
+    findAllTasks(@Query() paginationDto: PaginationDto) {
+      return this.guestsService.findAll(paginationDto);
     }
   
     @Get(':id')

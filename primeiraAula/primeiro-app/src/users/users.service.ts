@@ -6,13 +6,6 @@ import { User } from 'src/users/entities/user.entity';
 @Injectable()
 export class UsersService {
 
-    private users: User[] = [
-        {
-            id: 1,
-            user: "primeiro usuário"
-        }
-    ]
-
     findAll() {
         return this.users;
     }
