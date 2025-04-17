@@ -1,0 +1,37 @@
+https://docs.nestjs.com/recipes/prisma#set-up-prisma
+
+//Set up prisma
+npm install prisma --save-dev
+
+//Instalar e gerar o prisma client
+npm install @prisma/clientY
+
+//Conexão com o banco
+//Em schema.prisma
+provider = "sqlite"
+
+//Apaga o output no generation client
+
+//Modela-se os modelos no schema
+model Modelo {
+	nome Tipo @id @default(autoincrement())
+	nome? Tipo
+}
+
+//Em .env
+DATABASE_URL="file:./dev.db"
+
+//Migrar os modelos para o banco de dados
+npx prisma migrate dev
+
+//Gerando a camada do prisma automaticamente
+nest g module prisma
+nest g service prisma --no-spec
+nest g controller prisma --no-spec
+
+//PrismaModule precisa PrismaService como export
+
+//PrismaService precisa implementar OnModuleInit e OnModuleDestroy
+
+//Os módulos dos elementos precisam importar o PrismaService com o imports
+//Usa-se o constructor(private readonly prismaService: PrismaService) {} para uso do prisma no service dos elementos

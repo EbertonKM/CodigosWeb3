@@ -41,6 +41,7 @@ export class TasksService {
             })
             return newTask
         }catch(e) {
+            //console.log(e)
             throw new HttpException("Não foi possível cadastrar a tarefa", HttpStatus.BAD_REQUEST)
         }
     }
