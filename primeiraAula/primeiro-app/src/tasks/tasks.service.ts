@@ -36,7 +36,8 @@ export class TasksService {
         try {
             const newTask = await this.prismaService.task.create({
                 data: {
-                    task: createTaskDto.task
+                    task: createTaskDto.task,
+                    userId: createTaskDto.userId
                 }
             })
             return newTask
@@ -60,7 +61,9 @@ export class TasksService {
                 where: {
                     id: findTask.id
                 },
-                data: updateTaskDto
+                data: {
+                    task: updateTaskDto.task ? updateTaskDto.task : findTask.task
+                }
             })
             return task
         }catch(e) {

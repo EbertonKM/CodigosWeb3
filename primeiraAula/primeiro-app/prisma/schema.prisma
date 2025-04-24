@@ -18,6 +18,9 @@ model Task {
   task String
 
   created DateTime? @default(now())
+
+  userId Int?
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Guest {
@@ -30,8 +33,12 @@ model Guest {
 model User {
   id Int @id @default(autoincrement())
   user String
+  passwordHash String
+  email String @unique
 
   created DateTime? @default(now())
+
+  task Task[]
 }
 
 model Teacher {

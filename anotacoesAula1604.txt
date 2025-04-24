@@ -10,7 +10,7 @@ npm install @prisma/clientY
 //Em schema.prisma
 provider = "sqlite"
 
-//Apaga o output no generation client
+//Apaga o output no generator client
 
 //Modela-se os modelos no schema
 model Modelo {

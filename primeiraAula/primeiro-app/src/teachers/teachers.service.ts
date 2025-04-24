@@ -36,7 +36,7 @@ export class TeachersService {
         try {
             const newTeacher = await this.prismaService.teacher.create({
                 data: {
-                    task: crateTeacherDto.teacher
+                    teacher: crateTeacherDto.teacher
                 }
             })
             return newTeacher

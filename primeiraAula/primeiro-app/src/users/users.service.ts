@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable, RequestTimeoutException } from '@nestjs/common';
+import { useContainer } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -26,6 +27,12 @@ export class UsersService {
         const user = await this.prismaService.user.findFirst({
             where: {
                 id: id
+            },
+            select: {
+                id: true,
+                user: true,
+                email: true,
+                task: true
             }
         })
         if (user?.user) return user
@@ -36,7 +43,14 @@ export class UsersService {
         try {
             const newUser = await this.prismaService.user.create({
                 data: {
-                    task: createUserDto.user
+                    user: createUserDto.user,
+                    passwordHash: createUserDto.password, //Iremos gerar o hash
+                    email: createUserDto.email
+                },
+                select: {
+                    id: true,
+                    user: true,
+                    email: true
                 }
             })
             return newUser
@@ -59,7 +73,15 @@ export class UsersService {
                 where: {
                     id: findUser.id
                 },
-                data: updateUserDto
+                data: {
+                    user: updateUserDto.user ? updateUserDto.user : findUser.user,
+                    passwordHash: updateUserDto.password ? updateUserDto.password : findUser.passwordHash,
+                },
+                select: {
+                    id: true,
+                    user: true,
+                    email: true
+                }
             })
             return user
         }catch(e) {
