@@ -23,13 +23,6 @@ model Task {
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Guest {
-  id Int @id @default(autoincrement())
-  guest String
-
-  created DateTime? @default(now())
-}
-
 model User {
   id Int @id @default(autoincrement())
   user String
@@ -41,9 +34,21 @@ model User {
   task Task[]
 }
 
+model Guest {
+  id Int @id @default(autoincrement())
+  guest String
+
+  created DateTime? @default(now())
+
+  teacherId Int?
+  teacher Teacher? @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+}
+
 model Teacher {
   id Int @id @default(autoincrement())
   teacher String
 
   created DateTime? @default(now())
+  
+  guest Guest[]
 }

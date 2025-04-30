@@ -26,6 +26,11 @@ export class TeachersService {
         const teacher = await this.prismaService.teacher.findFirst({
             where: {
                 id: id
+            },
+            select: {
+                id: true,
+                teacher: true,
+                guest: true
             }
         })
         if (teacher?.teacher) return teacher
