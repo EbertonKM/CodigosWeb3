@@ -1,22 +1,98 @@
-import { Injectable } from "@nestjs/common";
-import { Encomenda } from "./entities/encomenda.entity";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
+import { PaginationDto } from "src/common/dto/pagination.dto";
+import { CreateEncomendaDto } from "./dto/create-encomenda.dto";
+import { UpdateEncomendaDto } from "./dto/update-encomenda.dto";
 
 @Injectable()
 export class EncomendasService {
-    private encomendas: Encomenda[] = [
-        {
-            id: 1,
-            codRastreio: "A233B212D312F483",
-            origem: "Porto União",
-            destino: "União da Vitória",
-            dataEmissao: "02-04-2025 22:29",
-            ultimaLocalizacao: "Remetente",
-            entregue: false,
-            observacoes: "Nenhuma"
-        }
-    ]
+    constructor(private readonly prismaService: PrismaService) {}
 
-    findAll() {
-        return this.encomendas;
+    async findAll(paginationDto: PaginationDto) {
+        const {limit = 10, offset = 0} = paginationDto
+
+        const allEncomendas = await this.prismaService.encomenda.findMany({
+            take: limit,
+            skip: offset,
+            orderBy: {
+                dataEmissao: 'desc'
+            }
+        })
+        return allEncomendas
+    }
+
+    async findOne(id: number) {
+        const encomenda = await this.prismaService.encomenda.findFirst({
+            where: {
+                id: id
+            }
+        })
+        if (encomenda?.id) return encomenda
+        throw new HttpException("Essa encomenda não existe", HttpStatus.NOT_FOUND)
+    }
+
+    async create(createEncomendaDto: CreateEncomendaDto) {
+        try {
+            const newEncomenda = await this.prismaService.encomenda.create({
+                data: {
+                    codRastreio: createEncomendaDto.codRastreio,
+                    origem: createEncomendaDto.origem,
+                    destino: createEncomendaDto.destino,
+                    entregadorId: createEncomendaDto.entregadorId,
+                    ultimaLocalizacao: "Endereço de origem",
+                    entregue: false
+                }
+            })
+            return newEncomenda
+        }catch(e) {
+            throw new HttpException("Não foi possível cadastrar a encomenda", HttpStatus.BAD_REQUEST)
+        }
+    }
+
+    async update(id: number, updateEncomendaDto: UpdateEncomendaDto) {
+        try {
+            const findEncomenda = await this.prismaService.encomenda.findFirst({
+                where: {
+                    id: id
+                }
+            })
+            if(!findEncomenda)
+                throw new HttpException("Essa encomenda não existe", HttpStatus.NOT_FOUND)
+
+            const encomenda = await this.prismaService.encomenda.update({
+                where: {
+                    id: findEncomenda.id
+                },
+                data: {
+                    ultimaLocalizacao: updateEncomendaDto.ultimaLocalizacao ? updateEncomendaDto.ultimaLocalizacao : findEncomenda.ultimaLocalizacao,
+                    entregue: updateEncomendaDto.entregue ? updateEncomendaDto.entregue : findEncomenda.entregue,
+                    observacoes: updateEncomendaDto.observacoes ? updateEncomendaDto.observacoes : findEncomenda.observacoes
+                }
+            })
+            return encomenda
+        }catch(e) {
+            throw new HttpException("Não foi possível atualizar a encomenda", HttpStatus.BAD_REQUEST)
+        }
+    }
+
+    async remove(id: number) {
+        try {
+            const findEncomenda = await this.prismaService.encomenda.findFirst({
+                where: {
+                    id: id
+                }
+            })
+            if(!findEncomenda)
+                throw new HttpException("Essa encomenda não existe", HttpStatus.NOT_FOUND)
+
+            await this.prismaService.encomenda.delete({
+                where: {
+                    id: findEncomenda.id
+                }
+            })
+            return "Encomenda excluída com sucesso"
+        }catch(e) {
+            throw new HttpException("Não foi possível deletar a encomenda", HttpStatus.BAD_REQUEST)
+        }
     }
 }

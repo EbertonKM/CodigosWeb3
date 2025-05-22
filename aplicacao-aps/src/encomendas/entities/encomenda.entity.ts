@@ -3,7 +3,7 @@ export class Encomenda {
     codRastreio: string;
     origem: string;
     destino: string;
-    dataEmissao: string; //futuramente ser trocado pelo formato de DateTime ideal
+    dataEmissao: Date; //Atribuido automaticamente na criação
     ultimaLocalizacao: string;
     entregue: boolean;
     //entregador: Entregador; Suponho que algo assim aconteça
